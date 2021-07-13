@@ -34,7 +34,7 @@ export default function Home() {
   const listOfPeoples = [ 'juunegreiros', 'omariosouto', 'peas', 'rafaballerini', 'marcobrunodev', 'felipefialho'];
   return (
     <>
-      <AlurakutMenu />
+      <AlurakutMenu githubUser={gitHubUser} />
       <GridMain>
         <div className='profileArea' style={{ gridArea: 'profileArea' }}>
           <ProfileSideBar gitHubUser={gitHubUser}/>
@@ -82,16 +82,18 @@ export default function Home() {
           <ProfileRelationsBoxWrapper>
             <h2 className="smallTitle">Minhas Comunidades ({comunities.length})</h2>
             <ul>
-                {comunities.map((itemAtual) => {
+              {comunities.map((itemAtual) => {
+                if(comunities.length < 7) {
                   return (
                     <li key={itemAtual.id}>
-                      <a href={`/users/${itemAtual.title}`}>
+                      <a href={`/users/${itemAtual.title}`} target='_blank'>
                         <img src={itemAtual.image} />
                         <span>{itemAtual.title}</span>
                       </a>
                     </li>
                   )
-                })}
+                }
+              })}
             </ul>
           </ProfileRelationsBoxWrapper>
           <ProfileRelationsBoxWrapper>
@@ -100,7 +102,7 @@ export default function Home() {
                 {listOfPeoples.map((itemAtual) => {
                   return (
                     <li key={itemAtual}>
-                      <a href={`/users/${itemAtual}`}>
+                      <a href={`https://github.com/${itemAtual}`} target='_blank'>
                         <img src={`https://github.com/${itemAtual}.png`} />
                         <span>{itemAtual}</span>
                       </a>
