@@ -22,6 +22,28 @@ function ProfileSideBar(props) {
   )
 }
 
+function ProfileRelationsBox(props) {
+  return(
+    <ProfileRelationsBoxWrapper>
+      <h2 className="smallTitle">{props.title} ({props.items.length})</h2>
+      <ul>
+        {props.items.map((itemAtual) => {
+          
+            return (
+              <li key={itemAtual.id}>
+                <a href={`/users/${itemAtual.login}`} target='_blank'>
+                  <img src={itemAtual.avatar_url} />
+                  <span>{itemAtual.login}</span>
+                </a>
+              </li>
+            )
+          
+        })}
+      </ul>
+    </ProfileRelationsBoxWrapper>
+  )
+}
+
 export default function Home() {
   const [comunities, setComunities] = React.useState([ 
     {
@@ -32,6 +54,18 @@ export default function Home() {
   ]);
   const gitHubUser = 'cesarlucasjunior';
   const listOfPeoples = [ 'juunegreiros', 'omariosouto', 'peas', 'rafaballerini', 'marcobrunodev', 'felipefialho'];
+  const [seguidores, setSeguidores] = React.useState([]);
+  React.useEffect(() => {
+    fetch('https://api.github.com/users/cesarlucasjunior/followers')
+      .then((response) => {
+        return response.json();
+      })
+      .then((response) => {
+        setSeguidores(response);
+      });
+  }, [])
+
+
   return (
     <>
       <AlurakutMenu githubUser={gitHubUser} />
@@ -79,23 +113,7 @@ export default function Home() {
           </Box>
         </div>
         <div className='profileRelationsArea' style={{ gridArea: 'profileRelationsArea' }}>
-          <ProfileRelationsBoxWrapper>
-            <h2 className="smallTitle">Minhas Comunidades ({comunities.length})</h2>
-            <ul>
-              {comunities.map((itemAtual) => {
-                if(comunities.length < 7) {
-                  return (
-                    <li key={itemAtual.id}>
-                      <a href={`/users/${itemAtual.title}`} target='_blank'>
-                        <img src={itemAtual.image} />
-                        <span>{itemAtual.title}</span>
-                      </a>
-                    </li>
-                  )
-                }
-              })}
-            </ul>
-          </ProfileRelationsBoxWrapper>
+          <ProfileRelationsBox title="Seguidores" items={seguidores}/>          
           <ProfileRelationsBoxWrapper>
             <h2 className="smallTitle">Pessoas da Comunidade ({listOfPeoples.length})</h2>
             <ul>
