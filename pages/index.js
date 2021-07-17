@@ -3,16 +3,18 @@ import GridMain from '../src/components/GridMain'
 import Box from '../src/components/Box'
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/components/libs/AluraCommons'
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
+import nookies from 'nookies'
+import jwt from 'jsonwebtoken'
 
 function ProfileSideBar(props) {
   return (
     <Box as='aside'>
-      <img src={`https://github.com/${props.gitHubUser}.png`}/>
+      <img src={`https://github.com/${props.githubUser}.png`}/>
       <hr />
 
       <p>
-        <a className='boxLink' href={`https://github.com/${props.gitHubUser}`}>
-          @{props.gitHubUser}
+        <a className='boxLink' href={`https://github.com/${props.githubUser}`}>
+          @{props.githubUser}
         </a>
       </p>
       <hr />
@@ -44,9 +46,10 @@ function ProfileRelationsBox(props) {
   )
 }
 
-export default function Home() {
+export default function Home(props) {
   const [comunities, setComunities] = React.useState([]);
-  const gitHubUser = 'cesarlucasjunior';
+  const githubUser = props.githubUser;
+  console.log(githubUser)
   const listOfPeoples = [ 'juunegreiros', 'omariosouto', 'peas', 'rafaballerini', 'marcobrunodev', 'felipefialho'];
   const [seguidores, setSeguidores] = React.useState([]);
   React.useEffect(() => {
@@ -86,10 +89,10 @@ export default function Home() {
 
   return (
     <>
-      <AlurakutMenu githubUser={gitHubUser} />
+      <AlurakutMenu githubUser={githubUser} />
       <GridMain>
         <div className='profileArea' style={{ gridArea: 'profileArea' }}>
-          <ProfileSideBar gitHubUser={gitHubUser}/>
+          <ProfileSideBar githubUser={githubUser}/>
         </div>
         <div className='welcomeArea' style={{ gridArea: 'welcomeArea' }}>
           <Box>
@@ -105,7 +108,7 @@ export default function Home() {
                 // id: new Date().toISOString(),
                 title: formDatas.get('title'),
                 imageUrl: formDatas.get('image'),
-                creatorSlug: gitHubUser,
+                creatorSlug: githubUser,
               }
               fetch('/api/comunities', {
                 method: 'POST',
@@ -176,4 +179,31 @@ export default function Home() {
       </GridMain>
     </>
   )
+}
+
+export async function getServerSideProps(context) {
+  const token = nookies.get(context).USER_TOKEN;
+  
+  const { isAuthenticated } = await fetch('https://alurakut.vercel.app/api/auth', {
+    headers: {
+      Authorization: token
+    }
+  }).then(response => response.json())
+
+  console.log(`is - ${isAuthenticated}`)
+
+  if(!isAuthenticated) {
+    return{
+      redirect: {
+        destination: '/login',
+        permanent: false
+      }
+    }
+  }
+  const { githubUser } = jwt.decode(token);
+  return {
+    props: {
+      githubUser
+    }
+  }
 }
